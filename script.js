@@ -294,39 +294,6 @@ function initHeartsCanvas() {
   animate();
 }
 
-/* ─────────────────────────────────────────────────────────────
-   10. MUSIC PLAYER
-───────────────────────────────────────────────────────────── */
-function initMusicPlayer() {
-  const audio  = $('#bg-music');
-  const btn    = $('#music-toggle');
-  const icon   = $('#music-icon');
-  const volume = $('#volume-slider');
-  if (!audio || !btn) return;
-
-  // Set initial volume from slider
-  audio.volume = parseFloat(volume.value);
-
-  btn.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play().then(() => {
-        icon.textContent = '▐▐';
-        btn.setAttribute('aria-label', 'Pause background music');
-      }).catch(() => {
-        // Autoplay blocked — user needs to interact first
-        console.info('Music autoplay blocked by browser. User must interact.');
-      });
-    } else {
-      audio.pause();
-      icon.textContent = '▶';
-      btn.setAttribute('aria-label', 'Play background music');
-    }
-  });
-
-  volume.addEventListener('input', () => {
-    audio.volume = parseFloat(volume.value);
-  });
-}
 
 /* ─────────────────────────────────────────────────────────────
    11. THEME TOGGLE (DARK / LIGHT MODE)
@@ -348,83 +315,6 @@ function initThemeToggle() {
     icon.textContent = isDark ? '☀' : '🌙';
     localStorage.setItem('anniversary-theme', isDark ? 'dark' : 'light');
   });
-}
-
-/* ─────────────────────────────────────────────────────────────
-   12. PHOTO GALLERY LIGHTBOX
-───────────────────────────────────────────────────────────── */
-function initLightbox() {
-  const lightbox     = $('#lightbox');
-  const lightboxImg  = $('#lightbox-img');
-  const lightboxCap  = $('#lightbox-caption');
-  const closeBtn     = $('.lightbox-close', lightbox);
-  const prevBtn      = $('.lightbox-prev', lightbox);
-  const nextBtn      = $('.lightbox-next', lightbox);
-  const items        = $$('.gallery-item');
-  if (!lightbox || !items.length) return;
-
-  let currentIndex = 0;
-
-  const open = (index) => {
-    currentIndex = index;
-    const item = items[index];
-    const img  = $('img', item);
-    lightboxImg.src = img.src;
-    lightboxImg.alt = img.alt;
-    lightboxCap.textContent = item.dataset.caption || '';
-    lightbox.hidden = false;
-    document.body.style.overflow = 'hidden';
-    lightbox.focus();
-  };
-
-  const close = () => {
-    lightbox.hidden = true;
-    lightboxImg.src = '';
-    document.body.style.overflow = '';
-    // Return focus to the triggering element
-    items[currentIndex]?.focus();
-  };
-
-  const showPrev = () => open((currentIndex - 1 + items.length) % items.length);
-  const showNext = () => open((currentIndex + 1) % items.length);
-
-  items.forEach((item, i) => {
-    item.setAttribute('tabindex', '0');
-    item.setAttribute('role', 'button');
-    item.setAttribute('aria-label', `View photo ${i + 1}`);
-    item.addEventListener('click', () => open(i));
-    item.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
-    });
-  });
-
-  closeBtn?.addEventListener('click', close);
-  prevBtn?.addEventListener('click', showPrev);
-  nextBtn?.addEventListener('click', showNext);
-
-  // Keyboard navigation
-  lightbox.setAttribute('tabindex', '-1');
-  document.addEventListener('keydown', (e) => {
-    if (lightbox.hidden) return;
-    if (e.key === 'Escape')     close();
-    if (e.key === 'ArrowLeft')  showPrev();
-    if (e.key === 'ArrowRight') showNext();
-  });
-
-  // Close on backdrop click
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) close();
-  });
-
-  // Touch swipe support
-  let touchStartX = 0;
-  lightbox.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-  lightbox.addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    if (Math.abs(dx) > 50) { dx < 0 ? showNext() : showPrev(); }
-  }, { passive: true });
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -544,39 +434,6 @@ function launchConfetti() {
   draw();
 }
 
-/* ─────────────────────────────────────────────────────────────
-   16. EASTER EGG
-   Type the word "forever" anywhere on the page to reveal
-───────────────────────────────────────────────────────────── */
-function initEasterEgg() {
-  const el = $('#easter-egg');
-  if (!el) return;
-
-  const secret  = 'forever';
-  let   buffer  = '';
-  let   timeout;
-
-  document.addEventListener('keydown', (e) => {
-    // Only capture printable single characters
-    if (e.key.length !== 1) return;
-    buffer += e.key.toLowerCase();
-
-    // Keep buffer trimmed
-    if (buffer.length > secret.length) {
-      buffer = buffer.slice(-secret.length);
-    }
-
-    clearTimeout(timeout);
-    timeout = setTimeout(() => { buffer = ''; }, 3000);
-
-    if (buffer === secret) {
-      buffer = '';
-      el.hidden = false;
-      if (CONFIG.enableConfetti) launchConfetti();
-      setTimeout(() => { el.hidden = true; }, 5000);
-    }
-  });
-}
 
 /* ─────────────────────────────────────────────────────────────
    17. PARALLAX — HERO SHAPES
@@ -627,12 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroDays();
   initCountdown();
   initHeartsCanvas();
-  initMusicPlayer();
   initThemeToggle();
-  initLightbox();
   initSurprise();
   initBackToTop();
-  initEasterEgg();
   initParallax();
   initSmoothNavTransitions();
 });
