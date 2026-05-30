@@ -1,0 +1,864 @@
+/* =============================================================
+   ANNIVERSARY WEBSITE — style.css
+   =============================================================
+   Table of Contents:
+   1. CSS Custom Properties (Variables)
+   2. Reset & Base
+   3. Loading Screen
+   4. Scroll Progress Bar
+   5. Navigation
+   6. Music Player
+   7. Theme Toggle
+   8. Back to Top Button
+   9. Floating Hearts Canvas
+   10. Hero Section
+   11. Section Shared Styles
+   12. Love Letter Section
+   13. Timeline Section
+   14. Gallery Section + Lightbox
+   15. Video Section
+   16. Reasons I Love You Section
+   17. Memory Wall / Polaroids
+   18. Countdown Section
+   19. Surprise Section
+   20. Easter Egg
+   21. Animations & Keyframes
+   22. Dark Mode
+   23. Responsive / Media Queries
+   ============================================================= */
+
+/* ─────────────────────────────────────────────────────────────
+   1. CSS CUSTOM PROPERTIES
+───────────────────────────────────────────────────────────── */
+:root {
+  /* Colors */
+  --blush:       #f9d0d8;
+  --blush-mid:   #f4afc0;
+  --rose:        #e8849a;
+  --rose-deep:   #c9647c;
+  --cream:       #fff8f9;
+  --white:       #ffffff;
+  --petal:       #fdeef1;
+  --ink:         #3d2030;
+  --ink-soft:    #6b4157;
+  --ink-light:   #9a6b7a;
+  --gold:        #c9a96e;
+  --gold-light:  #e6d4a8;
+
+  /* Gradients */
+  --grad-hero:   linear-gradient(135deg, #fff0f3 0%, #fce4ec 50%, #f8bbd0 100%);
+  --grad-letter: linear-gradient(160deg, #fffdf8 0%, #fff5f7 100%);
+  --grad-card:   linear-gradient(135deg, #fff8f9 0%, #fce4ec 100%);
+
+  /* Typography */
+  --font-display:    'Playfair Display', 'Georgia', serif;
+  --font-script:     'Dancing Script', cursive;
+  --font-body:       'Cormorant Garamond', 'Georgia', serif;
+  --font-sans:       'Lato', sans-serif;
+
+  /* Sizing */
+  --nav-h:       64px;
+  --radius-sm:   8px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-xl:   40px;
+
+  /* Shadows */
+  --shadow-sm:   0 2px 12px rgba(200, 100, 120, 0.12);
+  --shadow-md:   0 8px 32px rgba(200, 100, 120, 0.16);
+  --shadow-lg:   0 20px 60px rgba(200, 100, 120, 0.22);
+
+  /* Motion */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Transitions */
+  --tr-fast:   0.18s var(--ease-smooth);
+  --tr-mid:    0.35s var(--ease-smooth);
+  --tr-slow:   0.6s  var(--ease-smooth);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   2. RESET & BASE
+───────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 18px;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+canvas {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#hearts-canvas { z-index: 0; }
+#confetti-canvas { z-index: 9999; }
+
+/* ─────────────────────────────────────────────────────────────
+   3. LOADING SCREEN
+───────────────────────────────────────────────────────────── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--cream);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s var(--ease-smooth), visibility 0.8s;
+}
+
+#loading-screen.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-heart {
+  font-size: 3rem;
+  color: var(--rose);
+  animation: heartbeat 1s ease-in-out infinite;
+  display: block;
+}
+
+.loading-text {
+  font-family: var(--font-script);
+  font-size: 1.4rem;
+  color: var(--ink-soft);
+  margin-top: 1rem;
+  opacity: 0;
+  animation: fadeIn 0.6s 0.4s forwards;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. SCROLL PROGRESS BAR
+───────────────────────────────────────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blush-mid), var(--rose), var(--rose-deep));
+  z-index: 9998;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   5. NAVIGATION
+───────────────────────────────────────────────────────────── */
+#main-nav {
+  position: fixed;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0 1.5rem;
+  height: var(--nav-h);
+  background: rgba(255, 248, 249, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(248, 187, 208, 0.4);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transition: background var(--tr-mid);
+}
+
+#main-nav a {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  transition: color var(--tr-fast), background var(--tr-fast);
+}
+
+#main-nav a:first-child {
+  font-size: 1.1rem;
+  color: var(--rose);
+}
+
+#main-nav a:hover,
+#main-nav a.active {
+  color: var(--rose-deep);
+  background: rgba(248, 187, 208, 0.25);
+}
+
+
+/* ─────────────────────────────────────────────────────────────
+   7. THEME TOGGLE
+───────────────────────────────────────────────────────────── */
+#theme-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 800;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--blush);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--tr-fast), box-shadow var(--tr-mid);
+}
+
+#theme-toggle:hover {
+  transform: rotate(20deg) scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   8. BACK TO TOP BUTTON
+───────────────────────────────────────────────────────────── */
+#back-to-top {
+  position: fixed;
+  bottom: 5.5rem;
+  right: 1.5rem;
+  z-index: 800;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blush-mid), var(--rose));
+  color: white;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity var(--tr-mid), transform var(--tr-mid), box-shadow var(--tr-mid);
+}
+
+#back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+#back-to-top:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   9. HERO SECTION
+───────────────────────────────────────────────────────────── */
+.section-hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--nav-h) 2rem 6rem;
+  background: var(--grad-hero);
+  overflow: hidden;
+}
+
+/* Decorative background blobs */
+.hero-bg-shapes .shape {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.shape-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(249,208,216,0.5) 0%, transparent 70%);
+  top: -150px; right: -150px;
+  animation: floatBlob 10s ease-in-out infinite;
+}
+
+.shape-2 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(244,175,192,0.4) 0%, transparent 70%);
+  bottom: 50px; left: -100px;
+  animation: floatBlob 13s ease-in-out infinite reverse;
+}
+
+.shape-3 {
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(201,100,124,0.15) 0%, transparent 70%);
+  top: 40%; left: 30%;
+  animation: floatBlob 8s ease-in-out infinite 2s;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+}
+
+.hero-eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin-bottom: 1.5rem;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 8vw, 6rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--rose-deep);
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  color: var(--ink-soft);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.hero-date {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--ink-light);
+  margin-bottom: 3rem;
+}
+
+.btn-scroll {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--rose-deep);
+}
+
+.btn-arrow {
+  width: 44px; height: 44px;
+  border: 1.5px solid var(--rose);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  animation: bounceDown 2.5s ease-in-out infinite;
+  transition: background var(--tr-fast), color var(--tr-fast);
+}
+
+.btn-scroll:hover .btn-arrow {
+  background: var(--rose);
+  color: white;
+}
+
+.hero-petal-row {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.4rem;
+  color: var(--blush-mid);
+  padding: 1rem 0;
+  opacity: 0.6;
+  animation: petalSway 5s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. SECTION SHARED STYLES
+───────────────────────────────────────────────────────────── */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 7rem 2rem;
+}
+
+.section-label {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--rose);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 400;
+  text-align: center;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+}
+
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--ink-light);
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 3rem;
+}
+
+/* Reveal on scroll — initial state */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s var(--ease-smooth), transform 0.7s var(--ease-smooth);
+}
+
+.reveal-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger for siblings */
+.reveal-item:nth-child(2) { transition-delay: 0.1s; }
+.reveal-item:nth-child(3) { transition-delay: 0.2s; }
+.reveal-item:nth-child(4) { transition-delay: 0.3s; }
+.reveal-item:nth-child(5) { transition-delay: 0.4s; }
+.reveal-item:nth-child(6) { transition-delay: 0.5s; }
+
+/* ─────────────────────────────────────────────────────────────
+   11. LOVE LETTER SECTION
+───────────────────────────────────────────────────────────── */
+.section-letter {
+  background: var(--petal);
+}
+
+.letter-paper {
+  position: relative;
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 4rem 4.5rem;
+  box-shadow: var(--shadow-lg),
+              0 0 0 1px rgba(249,208,216,0.5),
+              8px 8px 0 rgba(249,208,216,0.25);
+  animation: letterEntrance 1s var(--ease-smooth) both;
+}
+
+/* Ruled line background */
+.letter-lines {
+  position: absolute;
+  inset: 4rem 4.5rem;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent calc(1.7rem * 1.7 - 1px),
+    rgba(248,187,208,0.18) calc(1.7rem * 1.7 - 1px),
+    rgba(248,187,208,0.18) calc(1.7rem * 1.7)
+  );
+  pointer-events: none;
+}
+
+.letter-content {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: 1.08rem;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.letter-content p {
+  margin-bottom: 1.4rem;
+}
+
+.letter-date {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  letter-spacing: 0.08em;
+  text-align: right;
+  margin-bottom: 2rem !important;
+}
+
+.letter-salutation {
+  font-family: var(--font-script);
+  font-size: 1.5rem !important;
+  color: var(--rose-deep);
+  margin-bottom: 2rem !important;
+}
+
+.letter-closing {
+  margin-top: 2rem !important;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.letter-signature {
+  font-family: var(--font-script);
+  font-size: 1.8rem;
+  color: var(--rose-deep);
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   17. COUNTDOWN SECTION
+───────────────────────────────────────────────────────────── */
+.section-countdown {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.section-countdown .section-label {
+  color: var(--rose);
+}
+
+.section-countdown .section-title,
+.section-countdown .section-subtitle {
+  color: var(--cream);
+}
+
+.section-countdown .section-subtitle {
+  color: var(--blush-mid);
+}
+
+.countdown-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 3rem auto;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.countdown-number {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 700;
+  color: var(--rose);
+  line-height: 1;
+  min-width: 2ch;
+  text-align: center;
+  display: block;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.countdown-label {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+}
+
+.countdown-sep {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 7vw, 4rem);
+  color: var(--rose-deep);
+  padding-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.countdown-bottom {
+  text-align: center;
+  font-family: var(--font-script);
+  font-size: 1.3rem;
+  color: var(--blush-mid);
+  margin-top: -1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   18. SURPRISE SECTION
+───────────────────────────────────────────────────────────── */
+.section-surprise {
+  background: linear-gradient(160deg, #fff0f4 0%, #fce4ec 100%);
+  text-align: center;
+}
+
+.surprise-wrapper {
+  max-width: 680px;
+  margin: 3rem auto 0;
+}
+
+.surprise-pre p {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 2rem;
+}
+
+.btn-surprise {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--blush-mid), var(--rose-deep));
+  padding: 1rem 2.5rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  letter-spacing: 0.05em;
+  transition: transform var(--tr-mid), box-shadow var(--tr-mid);
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.btn-surprise:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+.surprise-reveal {
+  animation: surpriseReveal 0.8s var(--ease-spring) both;
+}
+
+.surprise-reveal[hidden] { display: none; }
+
+.surprise-message {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2.5rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(248,187,208,0.4);
+}
+
+.surprise-icon {
+  font-size: 3rem;
+  color: var(--rose);
+  animation: heartbeat 1s ease-in-out infinite;
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.surprise-message h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+  font-style: italic;
+}
+
+.surprise-message p {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+  line-height: 1.75;
+  margin-bottom: 1rem;
+}
+
+.surprise-sign {
+  font-family: var(--font-script);
+  font-size: 1.3rem !important;
+  color: var(--rose-deep);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   20. HERO ANIMATION HELPERS
+───────────────────────────────────────────────────────────── */
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeUp 0.9s var(--ease-smooth) forwards;
+}
+.delay-1 { animation-delay: 0.25s; }
+.delay-2 { animation-delay: 0.5s; }
+.delay-3 { animation-delay: 0.75s; }
+.delay-4 { animation-delay: 1s; }
+
+/* ─────────────────────────────────────────────────────────────
+   21. ANIMATIONS & KEYFRAMES
+───────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes heartbeat {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.18); }
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(8px); }
+}
+
+@keyframes floatBlob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33%       { transform: translateY(-30px) rotate(3deg); }
+  66%       { transform: translateY(15px) rotate(-2deg); }
+}
+
+@keyframes petalSway {
+  0%, 100% { transform: rotate(0deg); }
+  50%       { transform: rotate(5deg); }
+}
+
+/* Override hover state to disable float while hovering */
+
+
+@keyframes letterEntrance {
+  from { opacity: 0; transform: perspective(1000px) rotateX(8deg) translateY(40px); }
+  to   { opacity: 1; transform: perspective(1000px) rotateX(0deg) translateY(0); }
+}
+
+@keyframes surpriseReveal {
+  from { opacity: 0; transform: scale(0.8) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232,132,154,0.4), var(--shadow-md); }
+  50%       { box-shadow: 0 0 0 12px rgba(232,132,154,0), var(--shadow-md); }
+}
+
+@keyframes countFlip {
+  from { transform: translateY(-10px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   22. DARK / ROMANTIC MODE
+───────────────────────────────────────────────────────────── */
+body.dark-mode {
+  --cream:       #1a0d12;
+  --petal:       #220f17;
+  --white:       #2a1420;
+  --ink:         #f5dde5;
+  --ink-soft:    #e8b8c8;
+  --ink-light:   #b8788a;
+  --blush:       #4a2030;
+  --blush-mid:   #7a3050;
+  --rose:        #e8849a;
+  --rose-deep:   #f4a0b5;
+  --gold-light:  #c9a96e;
+  --grad-hero:   linear-gradient(135deg, #1a0d12 0%, #2d1022 50%, #3d1530 100%);
+  --grad-letter: linear-gradient(160deg, #200e17 0%, #2a1320 100%);
+  --shadow-sm:   0 2px 12px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-lg:   0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode #main-nav {
+  background: rgba(26, 13, 18, 0.88);
+  border-bottom-color: rgba(74, 32, 48, 0.5);
+}
+
+body.dark-mode #theme-toggle,
+body.dark-mode #back-to-top {
+  background: rgba(42, 20, 32, 0.88);
+  border-color: var(--blush);
+}
+
+body.dark-mode .section-countdown {
+  background: #0d0609;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   23. RESPONSIVE / MEDIA QUERIES
+───────────────────────────────────────────────────────────── */
+
+/* Mobile ≤ 640px */
+@media (max-width: 640px) {
+  html { font-size: 16px; }
+
+  section { padding: 4.5rem 1.2rem; }
+
+  .letter-paper {
+    padding: 2.5rem 1.75rem;
+  }
+
+  .letter-lines {
+    inset: 2.5rem 1.75rem;
+  }
+
+
+  .countdown-grid {
+    gap: 0.5rem;
+  }
+
+  .countdown-sep { display: none; }
+
+
+  #theme-toggle, #back-to-top {
+    right: 0.75rem;
+  }
+
+  #back-to-top { bottom: 5rem; }
+  #theme-toggle { bottom: 0.75rem; }
+
+  #main-nav {
+    left: 0; right: 0;
+    transform: none;
+    border-radius: 0;
+    justify-content: center;
+    gap: 0;
+  }
+
+  #main-nav a { padding: 0.4rem 0.5rem; font-size: 0.65rem; }
+}
+
